@@ -1,0 +1,1 @@
+Hi! Thanks for visiting my page. For now I only use it as a blog, which you can check out [here](/blog)
