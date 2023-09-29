@@ -18,4 +18,4 @@ jobs:
       - name: Install and deploy
         run: |
           pip install -r requirements.txt
-          mkdocs gh-deploy
+          mkdocs gh-deploy --force
