@@ -178,3 +178,5 @@ else:
 ```
 
 And [here](https://github.com/maxme1/pascal-llvm/blob/master/pascal_llvm/tokenizer.py) you can view the full code for tokenization.
+
+In the next post we'll deal with parsing. That one won't be a 4min read :smiling_imp: 

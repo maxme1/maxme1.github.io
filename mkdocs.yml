@@ -2,6 +2,8 @@ site_name: Random projects
 
 plugins:
   - blog
+  - search
+  - autorefs
 
 theme:
   name: material
@@ -24,6 +26,7 @@ markdown_extensions:
   - admonition
   - pymdownx.details
   - pymdownx.superfences
+  - pymdownx.critic
   - attr_list
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
