@@ -1,1 +1,3 @@
-Hi! Thanks for visiting my page. For now I only use it as a blog, which you can check out [here](/blog)
+Hey! Welcome. I'm Max and I like building stuff. 
+
+Recently I started writing a [blog](/blog) about some of the things I built. [Check it out](/blog) :wink:

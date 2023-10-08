@@ -1,4 +1,4 @@
-site_name: Random projects
+site_name: Let's Build Things
 
 plugins:
   - blog
@@ -9,6 +9,9 @@ theme:
   name: material
   icon:
     repo: fontawesome/brands/github-alt
+  features:
+    - content.code.copy
+    - content.code.annotate
   palette:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate

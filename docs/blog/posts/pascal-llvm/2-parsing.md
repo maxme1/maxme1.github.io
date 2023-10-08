@@ -741,6 +741,11 @@ def _type(self):
 
 We'll seriously upgrade it in the next post, though.
 
+!!! note ""
+
+    Note that I wrote `kind = self._type()` instead of `type = self._type()`. This is because `type` is a builtin name 
+    in Python. And builtins shadowing, in most situations, is considered as bad code.
+
 #### Functions
 
 We're almost there, I promise! Functions are pretty similar to the main program itself: they have the same blocks + 
