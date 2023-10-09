@@ -3,6 +3,7 @@ slug: pascal-llvm-3
 date: 2023-10-08
 categories:
   - LLVM
+comments: true
 ---
 
 # Compiling Pascal with LLVM: Part 3
@@ -11,6 +12,8 @@ categories:
 
 Today we're going to write a bit less code that last time. But don't worry, I'll compensate that with a healthy scoop of
 (hopefully) new concepts!
+
+<!-- more -->
 
 ### Adding types
 

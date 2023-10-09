@@ -3,6 +3,7 @@ slug: pascal-llvm-2
 date: 2023-10-01
 categories:
   - LLVM
+comments: true
 ---
 
 # Compiling Pascal with LLVM: Part 2
