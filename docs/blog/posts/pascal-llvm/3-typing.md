@@ -222,6 +222,29 @@ def _type(self):
     return types.TYPE_NAMES[kind]
 ```
 
+a lot of repetitive stuff, although I managed to move some stuff out to these small functions:
+
+```python
+def _int(self):
+    neg = self.consumed(TokenType.OP, string='-')
+    value = int(self.consume(TokenType.NUMBER).string)
+    if neg:
+        return -value
+    return value
+
+def _array_dims(self):
+    first = self._int()
+    if self.consumed(TokenType.DOT):
+        self.consume(TokenType.DOT)
+        return first, self._int()
+    return 0, first
+```
+
+!!! note ""
+
+    By the way. Should the first part of array dims always be smaller than the second one? Or should we allow stuff like
+    `array[10..1] of integer`? I would expect the compiler to be smart enough to statically detect this :thinking_face:
+
 #### Functions
 
 Finally, let's fix that ugly crutch in `_prototype`:
@@ -774,7 +797,8 @@ def _dispatch(self, args: Sequence, signatures: Sequence[types.Signature], expec
 ```
 
 Also pretty simple, just loop over all the signatures we have and try to find a match based on the number of `args`,
-their types, and the `expected` return type of the function.
+their types, and the `expected` return type of the function. We also check along the way, that if an argument is 
+mutable we can only pass a variable to it.
 
 In the end we just fail with a `WrongType` if nothing was found.
 
@@ -956,7 +980,7 @@ In rest, this is just a combination of `If` and `While`, nothing new.
 
 ### Casting rules
 
-The last piece of the puzzle is the `can_cast` method, that handles all type casting:
+As I promised, here's the `can_cast` method, that handles all type casting:
 
 ```python
 def can_cast(self, kind: types.DataType, to: types.DataType) -> bool:
@@ -989,6 +1013,106 @@ def can_cast(self, kind: types.DataType, to: types.DataType) -> bool:
 ```
 
 I added comments to the relevant parts, so this should be pretty straightforward.
+
+### A bit of magic
+
+Finally, there's one more important bit that we need to talk about: `writeln`. 
+
+It turns out that Pascal does a bit of cheating, and exposes several _magic_ functions, that can't be implemented
+in the language itself. The most known of them is `writeln`: it can accept 
+[any number of arguments](https://en.wikipedia.org/wiki/Variadic_function) and each of them can have any type from a 
+long list of allowed types. So, once again, this is 100% legal:
+
+```pascal
+writeln;
+writeln(1);
+writeln(1, 2.5);
+writeln(1, 2.5, 'my string');
+```
+
+There is simply no way for us to try and squeeze this behaviour into our `_dispatch` method, in a way, `writeln` is 
+_an infinite_ number of overloaded functions.
+
+To do this we'll introduce a new concept:
+
+```python
+from abc import ABC, abstractmethod
+
+class MagicFunction(ABC):
+    @classmethod
+    @abstractmethod
+    def validate(cls, args, visit) -> DataType:
+        pass
+```
+
+!!! note ""
+
+    Yes, at this point we could replace this class with a function, but we'll extend it later, so introducing a new
+    type is super legit, I promise!
+
+`validate` will have to, wait for it, validate the incoming arguments and decide the return type of the function.
+In case of `writeln` this should look like so:
+
+```python
+class WriteLn(MagicFunction):
+    @classmethod
+    def validate(cls, args, visit) -> DataType:
+        for arg in args:
+            # we can write ~almost~ anything, so we don't care about the type
+            visit(arg, None, False)
+        return types.Void
+```
+
+and there are a few places we'll need to add support for it, but first, let's create a registry of magic functions:
+
+```python
+MAGIC_FUNCTIONS = {
+    'writeln': WriteLn,
+}
+```
+
+#### Program
+
+As soon as we enter the global scope, we must define all the magic functions:
+
+```python
+def _program(self, node: Program):
+    with self._enter():
+        # magic
+        for name, magic in MAGIC_FUNCTIONS.items():
+            self._store(name, magic(), None)
+
+        # ... the rest
+```
+
+#### Call
+
+Next, calling magic functions needs special treatment:
+
+```python
+def _call(self, node: Call, expected: types.DataType, lvalue: bool):
+    if not isinstance(node.target, Name):
+        raise WrongType(node)
+
+    # get all the functions with this name
+    kind, targets = self._resolve(node.target.normalized)
+    if isinstance(kind, MagicFunction):
+        return kind.validate(node.args, self.visit)
+
+    # ... the rest
+```
+
+#### Name
+
+And finally, we should desugar 0-arg calls:
+
+```python
+# replace
+if isinstance(kind, types.Function):
+
+# by
+if isinstance(kind, (types.Function, MagicFunction)):
+```
 
 That's it! Now we have a real-life type system. This took a while, but I hope you found something useful.
 
