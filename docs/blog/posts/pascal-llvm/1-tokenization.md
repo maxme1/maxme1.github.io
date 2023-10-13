@@ -18,6 +18,17 @@ book ["Crafting interpreters"](https://craftinginterpreters.com/) by [Bob Nystro
 as the official [tutorial for LLVM](https://llvm.org/docs/tutorial/). If you're into parsers or compilers, you should
 definitely check them out!
 
+
+This is a series of four posts:
+
+1. [Tokenization](/blog/2023/09/29/pascal-llvm-1/)
+2. [Parsing](/blog/2023/10/01/pascal-llvm-2/)
+3. [Typing](/blog/2023/10/08/pascal-llvm-3/)
+4. [Compilation](/blog/2023/10/13/pascal-llvm-4/)
+
+And [here](https://github.com/maxme1/pascal-llvm) you can view the final result!
+
+
 ## Why Pascal?
 
 There are two main reasons:
