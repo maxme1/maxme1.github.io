@@ -1070,5 +1070,6 @@ You can print the `module` before and after `pm.run(module)` and see the differe
 If you're reading this, thanks for sticking around! I hope you enjoyed reading this series of posts as much as I enjoyed
 implementing all this stuff. 
 
-There are a ton of ways one could improve this implementation, and it's by no means complete. Let me know in the 
-comments if there are some interesting aspects that I didn't cover!
+There are a ton of ways one could improve this implementation, and it's by no means complete, but I feel like it still
+gives a good perspective of what are the key components. 
+Let me know in the comments if there are some interesting aspects that I didn't cover!
