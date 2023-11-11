@@ -1,0 +1,790 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../category/llvm/">
+      
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
+    
+    
+      
+        <title>2023 - Let's Build Things</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.4b4a2bd9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.356b1318.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#2023" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Let&#39;s Build Things" class="md-header__button md-logo" aria-label="Let's Build Things" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Let's Build Things
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              2023
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Let&#39;s Build Things" class="md-nav__button md-logo" aria-label="Let's Build Things" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Let's Build Things
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Blog
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Archive
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    2023
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Categories
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../category/llvm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    LLVM
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content" data-md-component="content">
+    <div class="md-content__inner">
+      <header class="md-typeset">
+        <h1 id="2023">2023</h1>
+      </header>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2023-11-11 00:00:00">November 11, 2023</time></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              4 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="learning-a-new-language-with-llms"><a class="toclink" href="../../2023/11/11/learning-a-new-language-with-llms/">Learning a new language with LLMs</a></h2>
+<p>I <em>love</em> learning new languages, both programming and natural ones. It feels a bit magical when you realise how words
+in different languages are related and why they sound the way they do.</p>
+<p>There's been a few months since I started learning european portuguese. I really like it so far, especially how it
+sounds. Currently, I'm at a point where I can confidently read and understand almost any text, and, more or less,
+understand what native speakers are telling me. My main problem now is my vocabulary - when I want to say or write
+something it takes forever to recall some words.</p>
+<p>It's pretty funny because sometimes I just freeze trying to remember something and the person I'm talking to assumes I
+didn't understand anything and quickly switches to english.
+Yes, they say that practice is the best way to learn a new language, but how long will it take, if the first steps are
+so hard? </p>
+<p>Recently I stumbled across the <a href="https://arxiv.org/abs/2305.07759">TinyStories</a> paper. It's a great read, check it out!
+In brief, they generated ~2.7 million stories using the typical vocabulary of a 3-4 year old. They then trained several
+super small language models (I'm talking 4-6 orders of magnitude smaller than <a href="https://arxiv.org/abs/2303.08774">GPT-4</a>
+or <a href="https://arxiv.org/abs/2307.09288">Llama 2</a>) on these stories and proved that models with around 30M parameters are
+not only fluent in this restricted subset of english, but also show signs of basic reasoning regarding the text's
+content.</p>
+<div class="admonition note">
+<p>Hey, if a model with just 30M parameters can do it, then I can too!</p>
+</div>
+<p>Then it hit me. This is a great starting point to increase my vocabulary. I'll translate random texts from TinyStories
+to european portuguese and then fix the mistakes I made. Skipping ahead, this works even better than I expected!
+I literally feel how I'm memorising new words and constructs. Of course, this effect will saturate over time, but for
+now, this is the fastest I've ever learned a new language!</p>
+<p>I ended up writing a tool that simplifies most of the boilerplate. Its frontend is written in
+<a href="https://angular.io/">Angular</a>, the backend is <a href="https://fastapi.tiangolo.com/">FastAPI</a> and, of course, I use
+<a href="https://chat.openai.com/">ChatGPT</a> to fix my translations.</p>
+<p>As always, <a href="https://github.com/maxme1/tiny-stories">here</a> you can find the full code.
+And <a href="https://maxme1.github.io/tiny-stories/">here</a> is a live version which can be used in two modes:</p>
+<ol>
+<li>Static - just a static page with a small subset of the TinyStories (~3k). It will generate a prompt that you'll have
+   to manually paste into the chat with ChatGPT. It's not 100% automatic, but it's free, and I tried to simplify the
+   process as much as I could.</li>
+<li>Automatic - you have access to all ~2.7mil stories and all the checks are made though API calls to ChatGPT, but
+   you'll need an API token for that, and most importantly, you'll need to trust me that I won't steal it! Sadly,
+   OpenAI's API doesn't support <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">CORS</a>, so I have to route all
+   the requests though a self-hosted proxy server.</li>
+</ol>
+<div class="admonition note">
+<p>You can use the string <code>free</code> as the token, in which case it will be replaced with my personal token server-side.
+It's limited to 1 request per 10 minutes <del>because I don't want to go broke</del>, but I hope it should be enough. 
+Enjoy!</p>
+</div>
+
+    <nav class="md-post__action">
+      <a href="../../2023/11/11/learning-a-new-language-with-llms/">
+        Continue reading
+      </a>
+    </nav>
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2023-10-13 00:00:00">October 13, 2023</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="../../category/llvm/" class="md-meta__link">LLVM</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              17 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="compiling-pascal-with-llvm-part-4"><a class="toclink" href="../../2023/10/13/pascal-llvm-4/">Compiling Pascal with LLVM: Part 4</a></h2>
+<h3 id="compilation"><a class="toclink" href="../../2023/10/13/pascal-llvm-4/#compilation">Compilation</a></h3>
+<p>It took several hundreds of lines of code, but we're finally there! Today our compiler will come to life and finally
+compute something for us.</p>
+
+    <nav class="md-post__action">
+      <a href="../../2023/10/13/pascal-llvm-4/">
+        Continue reading
+      </a>
+    </nav>
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2023-10-08 00:00:00">October 8, 2023</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="../../category/llvm/" class="md-meta__link">LLVM</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              20 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="compiling-pascal-with-llvm-part-3"><a class="toclink" href="../../2023/10/08/pascal-llvm-3/">Compiling Pascal with LLVM: Part 3</a></h2>
+<h3 id="typing"><a class="toclink" href="../../2023/10/08/pascal-llvm-3/#typing">Typing</a></h3>
+<p>Today we're going to write a bit less code that last time. But don't worry, I'll compensate that with a healthy scoop of
+(hopefully) new concepts!</p>
+
+    <nav class="md-post__action">
+      <a href="../../2023/10/08/pascal-llvm-3/">
+        Continue reading
+      </a>
+    </nav>
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2023-10-01 00:00:00">October 1, 2023</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="../../category/llvm/" class="md-meta__link">LLVM</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              12 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="compiling-pascal-with-llvm-part-2"><a class="toclink" href="../../2023/10/01/pascal-llvm-2/">Compiling Pascal with LLVM: Part 2</a></h2>
+<h3 id="parsing"><a class="toclink" href="../../2023/10/01/pascal-llvm-2/#parsing">Parsing</a></h3>
+<p>Now to the fun part. We'll be using a recursive parser, just like in
+<a href="https://craftinginterpreters.com/parsing-expressions.html">Crafting interpreters</a>,
+so you can easily skip this part if you're familiar with the technique.
+I made a slight modification to the parsing of <a href="../../2023/10/01/pascal-llvm-2/#binary-operators">binary operators</a> though.</p>
+
+    <nav class="md-post__action">
+      <a href="../../2023/10/01/pascal-llvm-2/">
+        Continue reading
+      </a>
+    </nav>
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2023-09-29 00:00:00">September 29, 2023</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="../../category/llvm/" class="md-meta__link">LLVM</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              4 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="compiling-pascal-with-llvm-part-1"><a class="toclink" href="../../2023/09/29/pascal-llvm-1/">Compiling Pascal with LLVM: Part 1</a></h2>
+<p>I always wanted to learn LLVM, but I never felt that there are some useful problems I could solve with it in my line of
+work.
+Eventually I decided to just have some fun and make something dumb and not useful at all. Yes, we're gonna compile
+Pascal! A language that I used for the last time like 15 years ago.</p>
+<p>This series of posts is highly inspired by the brilliant
+book <a href="https://craftinginterpreters.com/">"Crafting interpreters"</a> by <a href="https://stuffwithstuff.com/">Bob Nystrom</a> as well
+as the official <a href="https://llvm.org/docs/tutorial/">tutorial for LLVM</a>. If you're into parsers or compilers, you should
+definitely check them out!</p>
+<p>This is a series of four posts:</p>
+<ol>
+<li><a href="/blog/2023/09/29/pascal-llvm-1/">Tokenization</a></li>
+<li><a href="/blog/2023/10/01/pascal-llvm-2/">Parsing</a></li>
+<li><a href="/blog/2023/10/08/pascal-llvm-3/">Typing</a></li>
+<li><a href="/blog/2023/10/13/pascal-llvm-4/">Compilation</a></li>
+</ol>
+<p>And <a href="https://github.com/maxme1/pascal-llvm">here</a> you can view the final result!</p>
+<h3 id="why-pascal"><a class="toclink" href="../../2023/09/29/pascal-llvm-1/#why-pascal">Why Pascal?</a></h3>
+<p>There are two main reasons:</p>
+<ul>
+<li>Pascal is in a kind of sweet spot: it has a pretty simple grammar, so writing a parser would be fairly easy, but it
+  has a lot of constructs not covered in the LLVM tutorial, like references, pointers, record types, functions
+  overloading, static typing and so on</li>
+<li>back in school my friend wrote a full-blown <a href="https://en.wikipedia.org/wiki/Roguelike">roguelike</a> in Pascal, and it
+  would be really cool to be able to compile it by myself. So yes, nostalgia plays a role in it, duh.</li>
+</ul>
+<h3 id="what-youll-need"><a class="toclink" href="../../2023/09/29/pascal-llvm-1/#what-youll-need">What you'll need</a></h3>
+<p>Everything is written in <code>Python3.11</code> with the <a href="https://github.com/numba/llvmlite">llvmlite</a> package.
+You can find the (almost) full implementation <a href="https://github.com/maxme1/pascal-llvm">here</a>. It lacks some minor stuff,
+like <a href="https://wiki.freepascal.org/subrange_types">subrange types</a>, but at this point adding them is more about
+implementing a small interface, than inventing something new.</p>
+<div class="admonition note">
+<p>Feel free to open an <a href="https://github.com/maxme1/pascal-llvm/issues">issue</a>
+or <a href="https://github.com/maxme1/pascal-llvm/pulls">PR</a> if you want to contribute in any way!</p>
+</div>
+
+    <nav class="md-post__action">
+      <a href="../../2023/09/29/pascal-llvm-1/">
+        Continue reading
+      </a>
+    </nav>
+  </div>
+</article>
+      
+      
+        
+          
+
+
+
+<nav class="md-pagination">
+  
+</nav>
+        
+      
+    </div>
+  </div>
+
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["content.code.copy", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.81fa17fe.min.js"></script>
+      
+    
+  </body>
+</html>

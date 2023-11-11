@@ -1,0 +1,1449 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../../09/29/pascal-llvm-1/">
+      
+      
+        <link rel="next" href="../../08/pascal-llvm-3/">
+      
+      
+      <link rel="icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
+    
+    
+      
+        <title>Compiling Pascal with LLVM: Part 2 - Let's Build Things</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.4b4a2bd9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.356b1318.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#compiling-pascal-with-llvm-part-2" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="Let&#39;s Build Things" class="md-header__button md-logo" aria-label="Let's Build Things" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Let's Build Things
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Compiling Pascal with LLVM: Part 2
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="Let&#39;s Build Things" class="md-nav__button md-logo" aria-label="Let's Build Things" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Let's Build Things
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Blog
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Archive
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2023/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    2023
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Categories
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/llvm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    LLVM
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#parsing" class="md-nav__link">
+    Parsing
+  </a>
+  
+    <nav class="md-nav" aria-label="Parsing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expressions" class="md-nav__link">
+    Expressions
+  </a>
+  
+    <nav class="md-nav" aria-label="Expressions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#literals" class="md-nav__link">
+    Literals
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#names" class="md-nav__link">
+    Names
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tails" class="md-nav__link">
+    Tails
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unary-operators" class="md-nav__link">
+    Unary operators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#binary-operators" class="md-nav__link">
+    Binary operators
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parenthesis" class="md-nav__link">
+    Parenthesis
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statements" class="md-nav__link">
+    Statements
+  </a>
+  
+    <nav class="md-nav" aria-label="Statements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#program" class="md-nav__link">
+    Program
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-body" class="md-nav__link">
+    The body
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-statement" class="md-nav__link">
+    The statement
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#if" class="md-nav__link">
+    If
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for-and-while" class="md-nav__link">
+    For and while
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#assignments" class="md-nav__link">
+    Assignments
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    Variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#functions" class="md-nav__link">
+    Functions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#final-program" class="md-nav__link">
+    Final program
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5v-5Z"/></svg>
+                        <time datetime="2023-10-01 00:00:00" class="md-ellipsis">October 1, 2023</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3H9m3 2 4 13 3-1-4-13-3 1M5 5v13h3V5H5M3 19v2h18v-2H3Z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/llvm/">LLVM</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5Z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              12 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+
+
+<h1 id="compiling-pascal-with-llvm-part-2">Compiling Pascal with LLVM: Part 2</h1>
+<h2 id="parsing">Parsing</h2>
+<p>Now to the fun part. We'll be using a recursive parser, just like in
+<a href="https://craftinginterpreters.com/parsing-expressions.html">Crafting interpreters</a>,
+so you can easily skip this part if you're familiar with the technique.
+I made a slight modification to the parsing of <a href="#binary-operators">binary operators</a> though.</p>
+<!-- more -->
+
+<div class="admonition note">
+<p>I wrote the parser for Pascal's grammar from memory (a <em>very</em> long-term memory), and apparently ended up with a less
+restrictive grammar. I might fix that in the future though.</p>
+</div>
+<p>We'll start with a simple class with several helper methods:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">tokenize</span> <span class="kn">import</span> <span class="n">TokenInfo</span>
+<span class="kn">from</span> <span class="nn">more_itertools</span> <span class="kn">import</span> <span class="n">peekable</span>
+<span class="kn">from</span> <span class="nn">..tokenizer</span> <span class="kn">import</span> <span class="n">TokenType</span>
+
+
+<span class="c1"># just for convenience</span>
+<span class="k">class</span> <span class="nc">ParseError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">Parser</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span> <span class="o">=</span> <span class="n">peekable</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">consume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">types</span><span class="p">:</span> <span class="n">TokenType</span><span class="p">,</span> <span class="n">string</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenInfo</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="n">string</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">(),</span> <span class="n">types</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">consumed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">types</span><span class="p">:</span> <span class="n">TokenType</span><span class="p">,</span> <span class="n">string</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="o">*</span><span class="n">types</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="n">string</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">success</span>
+
+    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenInfo</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ParseError</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">types</span><span class="p">:</span> <span class="n">TokenType</span><span class="p">,</span> <span class="n">string</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">types</span> <span class="ow">and</span> <span class="n">token</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">string</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">token</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div>
+<p>basically all they do is consume the next token while checking some constraints.</p>
+<p>Next, we'll build a collection
+of <a href="https://github.com/maxme1/pascal-llvm/blob/master/pascal_llvm/parser/nodes.py">nodes</a>, which the parser will have to
+generate.</p>
+<h3 id="expressions">Expressions</h3>
+<p>Expressions are the parts of code that produce a value.
+For example, these</p>
+<div class="highlight"><pre><span></span><code><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">f</span><span class="p">(</span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span>
+<span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="o">.</span><span class="n">count</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div>
+<p>are expressions, but this isn't</p>
+<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">then</span>
+<span class="k">begin</span>
+<span class="k">end</span><span class="o">;</span>
+</code></pre></div>
+<div class="admonition note">
+<p>Technically, not all calls produce values, because Pascal makes a distinction between functions and procedures,
+but here we'll treat procedures as functions that return <strong>void</strong>, and let the type system worry about them.</p>
+</div>
+<h4 id="literals">Literals</h4>
+<p>The simplest expression is a literal like <code>1</code> or <code>'abc'</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+
+<span class="c1"># we want each node to be unique, so that two nodes with same fields still won&#39;t be equal  </span>
+<span class="n">unique</span> <span class="o">=</span> <span class="n">dataclass</span><span class="p">(</span><span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+
+<span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Const</span><span class="p">:</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
+</code></pre></div>
+<p>next we'll add a <code>_primary</code> method to the <code>Parser</code>. Which will return this node:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># TokenType was defined in the previous post</span>
+<span class="kn">from</span> <span class="nn">.tokenizer</span> <span class="kn">import</span> <span class="n">TokenType</span>
+
+
+<span class="k">class</span> <span class="nc">Parser</span><span class="p">:</span>
+    <span class="c1"># ...</span>
+
+    <span class="c1"># expression is just a convenience method for now</span>
+    <span class="k">def</span> <span class="nf">_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_primary</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_primary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">case</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">NUMBER</span><span class="p">:</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">()</span><span class="o">.</span><span class="n">string</span>
+                <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">body</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">Const</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">body</span><span class="p">),</span> <span class="s1">&#39;integer&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">Const</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">body</span><span class="p">),</span> <span class="s1">&#39;real&#39;</span><span class="p">)</span>
+
+            <span class="k">case</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">()</span><span class="o">.</span><span class="n">string</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="s1">&#39;Strings must start and end with apostrophes&#39;</span><span class="p">)</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\00</span><span class="s1">&#39;</span>
+                <span class="k">return</span> <span class="n">Const</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span>
+
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">())</span>
+</code></pre></div>
+<div class="admonition note">
+<p>Here we use <a href="https://en.wikipedia.org/wiki/Null-terminated_string">null-terminated strings</a>, which is
+not very Pascal'ish. However, this will simplify things for us when we'll be working with C functions. </p>
+</div>
+<p>and now you can spin up the whole thing:</p>
+<div class="highlight"><pre><span></span><code><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="n">Parser</span><span class="p">(</span><span class="n">tokenize</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">_expression</span><span class="p">())</span>
+</code></pre></div>
+<p>this should give you something like <code>Const(value=1, type='integer')</code>, and if you try and call it with</p>
+<div class="highlight"><pre><span></span><code><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;x + y&#39;</span>
+</code></pre></div>
+<p>it would raise a <code>ParseError</code>. So far so good!</p>
+<h4 id="names">Names</h4>
+<p>While we're at it, let's add another simple node - name access. We'll emit it each time someone references a variable
+or function by its name:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Name</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+</code></pre></div>
+<p>this will be another case in the <code>_primary</code> function:</p>
+<div class="highlight"><pre><span></span><code><span class="k">case</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">Name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">()</span><span class="o">.</span><span class="n">string</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="tails">Tails</h4>
+<p>Next we'll parse something more interesting:</p>
+<div class="highlight"><pre><span></span><code><span class="n">f</span><span class="p">(</span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="o">,</span><span class="w"> </span><span class="n">x</span><span class="o">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span>
+<span class="n">student</span><span class="o">.</span><span class="n">name</span>
+<span class="k">array</span><span class="p">[</span><span class="kp">index</span><span class="p">]</span>
+<span class="n">myPointer</span><span class="o">^</span>
+</code></pre></div>
+<p>So, function calls, field access, array indexing and pointers dereferencing. As usual let's add some nodes first:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">GetItem</span><span class="p">:</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+
+
+<span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">GetField</span><span class="p">:</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Dereference</span><span class="p">:</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Any</span>
+
+
+<span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Call</span><span class="p">:</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>and a new method <code>_tail</code>. Let's start with pointers:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Parser</span><span class="p">:</span>
+    <span class="c1"># ...</span>
+
+    <span class="k">def</span> <span class="nf">_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tail</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_tail</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_primary</span><span class="p">()</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">LSQB</span><span class="p">,</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">DOT</span><span class="p">,</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">CIRCUMFLEX</span><span class="p">,</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">LPAR</span><span class="p">):</span>
+            <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">()</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+                <span class="k">case</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">CIRCUMFLEX</span><span class="p">:</span>
+                    <span class="n">target</span> <span class="o">=</span> <span class="n">Dereference</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+                <span class="c1"># ... other cases here</span>
+
+        <span class="k">return</span> <span class="n">target</span>
+</code></pre></div>
+<p>So, what's going on here?</p>
+<ol>
+<li>First we parse the <em>target</em> - a constant or a variable name. This is exactly what <code>_primary</code> returns</li>
+<li>Next, we check whether it has a <em>tail</em> - a dereferencing operator, a field access etc</li>
+<li>Finally, we wrap the target in a new node</li>
+</ol>
+<p>Also, because we use a while loop here, we'll be able to parse stuff like</p>
+<div class="highlight"><pre><span></span><code><span class="n">f</span><span class="p">(</span><span class="mi">1</span><span class="o">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">^</span>
+</code></pre></div>
+<p>Now let's add this logic. Field access is also as simple as</p>
+<div class="highlight"><pre><span></span><code><span class="k">case</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">DOT</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span><span class="o">.</span><span class="n">string</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">GetField</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+<p>Here we already consumed the dot in the <code>match self.consume...</code> part, so we consume the second token, which must be
+a name, and finally we wrap the target in the <code>GetField</code> node.</p>
+<p>Finally, two more interesting tails:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># array indexing</span>
+<span class="k">case</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">LSQB</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">()]</span>
+    <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">COMMA</span><span class="p">):</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">RSQB</span><span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">GetItem</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+<span class="c1"># function call</span>
+<span class="k">case</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">LPAR</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">RPAR</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">COMMA</span><span class="p">)</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">RPAR</span><span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">Call</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+</code></pre></div>
+<p>In both cases we parse a sequence of arguments separated by commas, and consume the matching bracket at the end.</p>
+<h4 id="unary-operators">Unary operators</h4>
+<p>In case of tails we were able to use a <code>while</code> loop, because we <em>first</em> needed to parse the target, and then an
+indefinite number of tails. In case of unary operators, though, the target comes at the very end, which means that we
+first need to consume all the unary operators, push them into a stack, then consume the target, and wrap it while
+unwinding the stack. This sounds like recursion to me:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_unary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="s1">&#39;not&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Unary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">()</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unary</span><span class="p">())</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tail</span><span class="p">()</span>
+</code></pre></div>
+<p>and let's not forget the node:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Unary</span><span class="p">:</span>
+    <span class="n">op</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+</code></pre></div>
+<h4 id="binary-operators">Binary operators</h4>
+<p>Binary operators are particularly interesting, because with them the notion of <code>priority</code> or <code>precedence</code> arises very
+naturally. If you're not a <a href="https://en.wikipedia.org/wiki/Lisp_(programming_language)">lisper</a>, then probably you
+wouldn't like writing</p>
+<div class="highlight"><pre><span></span><code><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span>
+</code></pre></div>
+<p>as</p>
+<div class="highlight"><pre><span></span><code><span class="p">(((</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="p">))</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mi">4</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">5</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">6</span><span class="p">)</span>
+</code></pre></div>
+<p>this is where operators precedence kicks in.</p>
+<div class="admonition note">
+<p>By the way, you should definitely check out <a href="https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs">SICP</a>,
+it's a timeless classic!</p>
+</div>
+<p>We'll parse that in the following way. First, let's group the operators by precedence:</p>
+<div class="highlight"><pre><span></span><code><span class="n">PRIORITIES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;*&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;/&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;div&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;mod&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;and&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;+&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;-&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;or&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;&gt;=&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;&lt;=&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;&lt;&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;=&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s1">&#39;&lt;&gt;&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s1">&#39;in&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">MAX_PRIORITY</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">PRIORITIES</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+</code></pre></div>
+<p>next we start from the operations with the lowest precedence (max priority), and try to build its arguments from terms
+of higher precedence:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_binary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">priority</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">priority</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unary</span><span class="p">()</span>
+
+    <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary</span><span class="p">(</span><span class="n">priority</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span><span class="o">.</span><span class="n">string</span> <span class="ow">in</span> <span class="n">PRIORITIES</span><span class="p">:</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span><span class="o">.</span><span class="n">string</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">PRIORITIES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">op</span><span class="p">)</span>
+        <span class="c1"># only consume the operation with the same priority</span>
+        <span class="k">if</span> <span class="n">current</span> <span class="o">!=</span> <span class="n">priority</span><span class="p">:</span>
+            <span class="k">break</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">()</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary</span><span class="p">(</span><span class="n">current</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="n">Binary</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">left</span>
+</code></pre></div>
+<p>Basically here we're saying, that</p>
+<div class="highlight"><pre><span></span><code>1 * 2 + 3 * 4
+</code></pre></div>
+<p>is, first of all, a <code>+</code> with its arguments <code>1 * 2</code> and <code>3 * 4</code>. This is why both <code>left</code> and <code>right</code> are assigned
+to operators with <code>priority - 1</code>. At the end we just fallback to <code>_unary</code> when we run out of operators.</p>
+<p>Finally, as always, the node:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Binary</span><span class="p">:</span>
+    <span class="n">op</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">left</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">right</span><span class="p">:</span> <span class="n">Any</span>
+</code></pre></div>
+<p>and also let's update the <code>_expression</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_binary</span><span class="p">(</span><span class="n">MAX_PRIORITY</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="parenthesis">Parenthesis</h4>
+<p>Yes, we just got rid of parentheses with the help of precedence. Now let's add them back in!</p>
+<p>Parentheses have a very high priority, higher than any binary or unary operation or even a function call. So, <code>_primary</code>
+is the best place for them:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_primary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+        <span class="k">case</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">LPAR</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">()</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">RPAR</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">value</span>
+
+        <span class="c1"># ... previous code</span>
+</code></pre></div>
+<p>We don't need a separate node for this branch, because the information about precedence kind of emerges in the syntax 
+tree by itself. However, sometimes it's a good idea to keep this information more explicit, e.g. when you're using your
+parser to write a code formatter.</p>
+<p>This took a while, but we're finally done with parsing expressions. Now you can play with the parser and generate really
+complex structures. Note how parentheses influence (sometimes) the structure of the syntax tree. </p>
+<h3 id="statements">Statements</h3>
+<p>Until now, we wrote the parser starting with the deepest nodes. This is useful when you want to be able to spin up the 
+parser as you progress, and watch how it gets smarter. We'll do the same thing with statements, but in reverse.</p>
+<h4 id="program">Program</h4>
+<p>We'll start with simple programs that don't contain variables or functions:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Program</span><span class="p">:</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>Don't worry, we'll update this node later.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_program</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># program name</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;program&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">LPAR</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">RPAR</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">SEMI</span><span class="p">)</span>
+
+    <span class="c1"># the body, including the `end`</span>
+    <span class="n">statements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_body</span><span class="p">()</span>
+
+    <span class="c1"># final dot</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">DOT</span><span class="p">)</span>
+    <span class="c1"># no more tokens should remain</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">peek</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">Program</span><span class="p">(</span><span class="n">statements</span><span class="p">)</span>
+</code></pre></div>
+<p>The only interesting part is the name parsing. It turns out, that Pascal allows the programmer to specify the names
+of input and output files used, something like 
+<div class="highlight"><pre><span></span><code><span class="k">program</span><span class="w"> </span><span class="n">myName</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span><span class="o">;</span>
+</code></pre></div></p>
+<p>I didn't know that until I started googling for larger samples of Pascal code just to test my parser.</p>
+<h4 id="the-body">The body</h4>
+<p>The body is just a sequence of statements between <code>begin</code> and <code>end</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">jboc</span> <span class="kn">import</span> <span class="n">composed</span>
+
+<span class="c1"># ...</span>
+
+<span class="nd">@composed</span><span class="p">(</span><span class="nb">tuple</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;begin&#39;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;end&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;begin&#39;</span><span class="p">):</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_body</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statement</span><span class="p">()</span>
+        <span class="c1"># the semicolon is optional in the last statement</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;end&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">SEMI</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;end&#39;</span><span class="p">)</span>
+</code></pre></div>
+<p>Note that there's a special case we're dealing with: <code>begin</code>-<code>end</code> blocks can be nested. However, unlike most of
+modern languages, Pascal doesn't allow variables definition inside blocks, so this nesting doesn't have any semantic 
+implications, that's why we're just unpacking it.</p>
+<div class="admonition note">
+<p>Here <code>@composed(tuple)</code> simply gathers all we've <code>yeild</code>-ed from the function into a tuple. This is handy in many
+situations.</p>
+</div>
+<h4 id="the-statement">The statement</h4>
+<p>For now, the only statement we know of is an <em>expression statement</em>, like a function call, or a useless arithmetic 
+operation that isn't stored anywhere: </p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_statement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">()</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">ExpressionStatement</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span>
+</code></pre></div>
+<p>with a simple node</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">ExpressionStatement</span><span class="p">:</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+</code></pre></div>
+<p>Aaaaand we're finally ready to parse entire (but simple) programs like this one:</p>
+<div class="highlight"><pre><span></span><code><span class="k">program</span><span class="w"> </span><span class="n">itWorks</span><span class="o">;</span>
+<span class="k">begin</span>
+<span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">2</span><span class="o">;</span>
+<span class="w">    </span><span class="nb">writeln</span><span class="p">(</span><span class="mi">3</span><span class="o">,</span><span class="w"> </span><span class="mi">4</span><span class="o">,</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="o">;</span>
+<span class="w">    </span><span class="nb">writeln</span><span class="p">(</span><span class="mi">6</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">7</span><span class="o">,</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">9</span><span class="p">)</span>
+<span class="k">end</span><span class="o">.</span>
+</code></pre></div>
+<p>Pretty cool! The rest is just about adding more content. Let's dig quickly through the basics.</p>
+<h4 id="if">If</h4>
+<p>Because <code>begin</code>-<code>end</code> is only required for multiple expressions, we'll be using this util function a lot:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_flexible_body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;begin&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_body</span><span class="p">()</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_statement</span><span class="p">(),</span>
+</code></pre></div>
+<p>Now let's parse some statements:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_if</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;if&#39;</span><span class="p">)</span>
+    <span class="n">condition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;then&#39;</span><span class="p">)</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flexible_body</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;else&#39;</span><span class="p">):</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flexible_body</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="k">return</span> <span class="n">If</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+</code></pre></div>
+<p>Yep, basic if-then-else stuff.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">If</span><span class="p">:</span>
+    <span class="n">condition</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">then_</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+    <span class="n">else_</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<h4 id="for-and-while">For and while</h4>
+<p>This is more or less the same</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_for</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;for&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span><span class="o">.</span><span class="n">string</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">COLONEQUAL</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;to&#39;</span><span class="p">)</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;do&#39;</span><span class="p">)</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flexible_body</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">For</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_while</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;while&#39;</span><span class="p">)</span>
+    <span class="n">condition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;do&#39;</span><span class="p">)</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flexible_body</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">While</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">body</span><span class="p">)</span>
+</code></pre></div>
+<p>and the nodes </p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">For</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Name</span>
+    <span class="n">start</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">stop</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+
+<span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">While</span><span class="p">:</span>
+    <span class="n">condition</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<h4 id="assignments">Assignments</h4>
+<p>With new structures in place, it's time to update the <code>_statement</code>. We'll also add assignment syntax while we're at it:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_statement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;if&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_if</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;for&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_for</span><span class="p">()</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;while&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_while</span><span class="p">()</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="n">Name</span><span class="p">,</span> <span class="n">GetItem</span><span class="p">,</span> <span class="n">GetField</span><span class="p">,</span> <span class="n">Dereference</span><span class="p">))</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">COLONEQUAL</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">Assignment</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">ExpressionStatement</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span>
+</code></pre></div>
+<p>Here what's going on. The last part is all about the difference between</p>
+<div class="highlight"><pre><span></span><code><span class="n">student</span><span class="o">.</span><span class="n">grade</span><span class="o">;</span>
+</code></pre></div>
+<p>and</p>
+<div class="highlight"><pre><span></span><code><span class="n">student</span><span class="o">.</span><span class="n">grade</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">10</span><span class="o">;</span>
+</code></pre></div>
+<div class="admonition note">
+<p>Yes, that's how we assign stuff to variables in Pascal - with the 
+<a href="https://www.mail-archive.com/python-committers@python.org/msg05628.html">notorious</a> walrus operator </p>
+</div>
+<p>We can't make a difference beforehand, because the expression can have a super long tail:</p>
+<div class="highlight"><pre><span></span><code><span class="n">students</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">grades</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">10</span><span class="o">;</span>
+</code></pre></div>
+<p>So we'll just start parsing it like a simple expression, then check the next token. If it's <code>:=</code> - we've got an
+assignment, otherwise - it's a simple expression statement.</p>
+<p>And, of course, assignment deserves its own node:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Assignment</span><span class="p">:</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">Name</span> <span class="o">|</span> <span class="n">GetItem</span> <span class="o">|</span> <span class="n">GetField</span> <span class="o">|</span> <span class="n">Dereference</span>
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+</code></pre></div>
+<div class="admonition note">
+<p>Here we only allow assignment for certain expressions, because, say, <code>1 + 1 := 3</code> doesn't make a lot of sense</p>
+</div>
+<h4 id="variables">Variables</h4>
+<p>Variable definition in Pascal can only happen in a special block before the body, to complicate things, we are 
+allowed to use several such blocks:</p>
+<div class="highlight"><pre><span></span><code><span class="k">var</span><span class="w"> </span><span class="n">x1</span><span class="o">,</span><span class="w"> </span><span class="n">x2</span><span class="o">:</span><span class="w"> </span><span class="kt">integer</span><span class="o">;</span>
+<span class="w">    </span><span class="n">y</span><span class="o">:</span><span class="w"> </span><span class="kt">real</span><span class="o">;</span>
+<span class="k">var</span><span class="w"> </span><span class="n">z</span><span class="o">:</span><span class="w"> </span><span class="k">string</span><span class="o">;</span>
+</code></pre></div>
+<p>so we'll have to do more checks than usual: </p>
+<div class="highlight"><pre><span></span><code><span class="nd">@composed</span><span class="p">(</span><span class="nb">tuple</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;var&#39;</span><span class="p">,</span> <span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;procedure&#39;</span><span class="p">,</span> <span class="s1">&#39;begin&#39;</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_definition</span><span class="p">()</span>
+</code></pre></div>
+<p>Here a definition is a set of names that share a type:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Definitions</span><span class="p">:</span>
+    <span class="n">names</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Name</span><span class="p">]</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
+</code></pre></div>
+<p>and we parse it like so</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">Name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span><span class="o">.</span><span class="n">string</span><span class="p">)]</span>
+    <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">COMMA</span><span class="p">):</span>
+        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span><span class="o">.</span><span class="n">string</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">COLON</span><span class="p">)</span>
+    <span class="n">kind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">SEMI</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Definitions</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">names</span><span class="p">),</span> <span class="n">kind</span><span class="p">)</span>
+</code></pre></div>
+<p><code>_type</code> <em>for now</em> is just</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;real&#39;</span><span class="p">,</span> <span class="s1">&#39;integer&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">())</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">()</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</code></pre></div>
+<p>We'll seriously upgrade it in the next post, though.</p>
+<div class="admonition note">
+<p>Note that I wrote <code>kind = self._type()</code> instead of <code>type = self._type()</code>. This is because <code>type</code> is a builtin name 
+in Python. And builtins shadowing, in most situations, is considered as bad code.</p>
+</div>
+<h4 id="functions">Functions</h4>
+<p>We're almost there, I promise! Functions are pretty similar to the main program itself: they have the same blocks + 
+arguments and a return type (which can be <code>void</code>):</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">ArgDefinition</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Name</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
+
+<span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Function</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Name</span>
+    <span class="n">args</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ArgDefinition</span><span class="p">]</span>
+    <span class="n">variables</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Definitions</span><span class="p">]</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+    <span class="n">return_type</span><span class="p">:</span> <span class="nb">str</span>
+</code></pre></div>
+<div class="admonition note">
+<p>Why am I using here <code>Name</code> instead of <code>str</code> as the function and arg names? That's because, unlike you, I know the 
+future! In the next post we'll make heavy use of these names wrapped in <code>Name</code>.</p>
+</div>
+<p>All we need to parse a function is just</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prototype</span><span class="p">()</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">()</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_body</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">SEMI</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Function</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+</code></pre></div>
+<p>Kinda anticlimactic, right? All the interesting part happens inside the prototype:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_prototype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">is_func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_func</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;procedure&#39;</span><span class="p">)</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span><span class="o">.</span><span class="n">string</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">LPAR</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">RPAR</span><span class="p">):</span>
+            <span class="n">mutable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;var&#39;</span><span class="p">)</span>
+            <span class="n">group</span> <span class="o">=</span> <span class="p">[</span><span class="n">Name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span><span class="o">.</span><span class="n">string</span><span class="p">)]</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">COMMA</span><span class="p">):</span>
+                <span class="n">group</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span><span class="o">.</span><span class="n">string</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">COLON</span><span class="p">)</span>
+            <span class="n">kind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">mutable</span><span class="p">:</span>
+                <span class="n">kind</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;reference(</span><span class="si">{</span><span class="n">kind</span><span class="si">}</span><span class="s1">)&#39;</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">ArgDefinition</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">kind</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">group</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">COMMA</span><span class="p">,</span> <span class="n">TokenType</span><span class="o">.</span><span class="n">SEMI</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">RPAR</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">is_func</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">COLON</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="s1">&#39;void&#39;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">SEMI</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="n">ret</span>
+</code></pre></div>
+<p>Most of this should be pretty easy by now, except maybe the part with <code>kind = f'reference({kind})'</code>. What's going on 
+here? </p>
+<p>Pascal allows us to define mutable arguments in functions:</p>
+<div class="highlight"><pre><span></span><code><span class="k">procedure</span><span class="w"> </span><span class="nf">inc</span><span class="p">(</span><span class="k">var</span><span class="w"> </span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="kt">integer</span><span class="p">)</span><span class="o">;</span>
+<span class="k">begin</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="o">;</span>
+<span class="k">end</span><span class="o">;</span>
+</code></pre></div>
+<p>This function doesn't return anything, it just changes its argument inplace. All this thanks to that little <code>var</code>. 
+For now I added this ugly crutch <code>kind = f'reference({kind})'</code>, in the next post we'll fix it <img alt="😉" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@14.1.2/assets/svg/1f609.svg" title=":wink:" /></p>
+<h4 id="final-program">Final program</h4>
+<p>With all the parts in place this is what the program will really look like:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@unique</span>
+<span class="k">class</span> <span class="nc">Program</span><span class="p">:</span>
+    <span class="n">variables</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Definitions</span><span class="p">]</span>
+    <span class="n">functions</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Function</span><span class="p">]</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+<p>and we'll parse it as simply as:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_program</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">,</span> <span class="n">string</span><span class="o">=</span><span class="s1">&#39;program&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">consumed</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">LPAR</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">RPAR</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">SEMI</span><span class="p">)</span>
+
+    <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variables</span><span class="p">()</span>
+    <span class="n">functions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span><span class="o">.</span><span class="n">string</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;function&#39;</span><span class="p">,</span> <span class="s1">&#39;procedure&#39;</span><span class="p">):</span>
+        <span class="n">functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_function</span><span class="p">())</span>
+
+    <span class="n">statements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_body</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">consume</span><span class="p">(</span><span class="n">TokenType</span><span class="o">.</span><span class="n">DOT</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">peek</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">Program</span><span class="p">(</span><span class="n">variables</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">functions</span><span class="p">),</span> <span class="n">statements</span><span class="p">)</span>
+</code></pre></div>
+<p>This wasn't as sparse as the previous post, was it? Now, with all the bits in place, let's get to something even cooler:
+next time we'll build an entire type system, with compile-time errors and stuff! </p>
+
+
+
+  
+
+
+
+  <h2 id="__comments">Comments</h2>
+  <script src="https://giscus.app/client.js"
+        data-repo="maxme1/maxme1.github.io"
+        data-repo-id="R_kgDOKaCvAw"
+        data-category="General"
+        data-category-id="DIC_kwDOKaCvA84CZx-l"
+        data-mapping="title"
+        data-strict="1"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async>
+  </script>
+
+  <!-- Synchronize Giscus theme with palette -->
+  <script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
+
+      
+    </article>
+  </div>
+
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../../../..", "features": ["content.code.copy", "content.code.annotate"], "search": "../../../../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.81fa17fe.min.js"></script>
+      
+    
+  </body>
+</html>

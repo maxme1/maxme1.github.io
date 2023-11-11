@@ -1,0 +1,1739 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../08/pascal-llvm-3/">
+      
+      
+        <link rel="next" href="../../../11/11/learning-a-new-language-with-llms/">
+      
+      
+      <link rel="icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
+    
+    
+      
+        <title>Compiling Pascal with LLVM: Part 4 - Let's Build Things</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.4b4a2bd9.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.356b1318.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&"object"==typeof palette.color)for(var key of Object.keys(palette.color))document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#compiling-pascal-with-llvm-part-4" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="Let&#39;s Build Things" class="md-header__button md-logo" aria-label="Let's Build Things" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Let's Build Things
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Compiling Pascal with LLVM: Part 4
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7M9 21v-1h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1m3-17a5 5 0 0 0-5 5c0 2.05 1.23 3.81 3 4.58V16h4v-2.42c1.77-.77 3-2.53 3-4.58a5 5 0 0 0-5-5Z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="Let&#39;s Build Things" class="md-nav__button md-logo" aria-label="Let's Build Things" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    Let's Build Things
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Blog
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Blog
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Archive
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2023/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    2023
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Categories
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/llvm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    LLVM
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#compilation" class="md-nav__link">
+    Compilation
+  </a>
+  
+    <nav class="md-nav" aria-label="Compilation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a-working-prototype" class="md-nav__link">
+    A working prototype
+  </a>
+  
+    <nav class="md-nav" aria-label="A working prototype">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#expression-statement" class="md-nav__link">
+    Expression statement
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#const" class="md-nav__link">
+    Const
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#binary" class="md-nav__link">
+    Binary
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-the-code" class="md-nav__link">
+    Running the code
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variables" class="md-nav__link">
+    Variables
+  </a>
+  
+    <nav class="md-nav" aria-label="Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name" class="md-nav__link">
+    Name
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dereference" class="md-nav__link">
+    Dereference
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unary" class="md-nav__link">
+    Unary
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getfield" class="md-nav__link">
+    GetField
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getitem" class="md-nav__link">
+    GetItem
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#assignment" class="md-nav__link">
+    Assignment
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statements" class="md-nav__link">
+    Statements
+  </a>
+  
+    <nav class="md-nav" aria-label="Statements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#if" class="md-nav__link">
+    If
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#while" class="md-nav__link">
+    While
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#for" class="md-nav__link">
+    For
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#functions-and-calls" class="md-nav__link">
+    Functions and calls
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions and calls">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#function-definitions" class="md-nav__link">
+    Function definitions
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#function" class="md-nav__link">
+    Function
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#call" class="md-nav__link">
+    Call
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#even-more-magic" class="md-nav__link">
+    Even more magic
+  </a>
+  
+    <nav class="md-nav" aria-label="Even more magic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read" class="md-nav__link">
+    Read
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#readln" class="md-nav__link">
+    ReadLn
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#final-preparations" class="md-nav__link">
+    Final preparations
+  </a>
+  
+    <nav class="md-nav" aria-label="Final preparations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#type-casting" class="md-nav__link">
+    Type casting
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#desugaring" class="md-nav__link">
+    Desugaring
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#magic-registry" class="md-nav__link">
+    Magic registry
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimization" class="md-nav__link">
+    Optimization
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    ~
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5v-5Z"/></svg>
+                        <time datetime="2023-10-13 00:00:00" class="md-ellipsis">October 13, 2023</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3H9m3 2 4 13 3-1-4-13-3 1M5 5v13h3V5H5M3 19v2h18v-2H3Z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/llvm/">LLVM</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7h1.5Z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              17 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+
+
+<h1 id="compiling-pascal-with-llvm-part-4">Compiling Pascal with LLVM: Part 4</h1>
+<h2 id="compilation">Compilation</h2>
+<p>It took several hundreds of lines of code, but we're finally there! Today our compiler will come to life and finally
+compute something for us.</p>
+<!-- more -->
+
+<h3 id="a-working-prototype">A working prototype</h3>
+<p>Let's start small and build a compiler that works with something super dumb:</p>
+<div class="highlight"><pre><span></span><code><span class="k">program</span><span class="w"> </span><span class="n">add</span><span class="o">;</span>
+<span class="k">begin</span>
+<span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="o">;</span>
+<span class="k">end</span><span class="o">.</span>
+</code></pre></div>
+<p>We'll start with that, and work our way up. Here's our compiler class:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">llvmlite</span> <span class="kn">import</span> <span class="n">ir</span>
+
+
+<span class="k">class</span> <span class="nc">Compiler</span><span class="p">(</span><span class="n">Visitor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">:</span> <span class="n">TypeSystem</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">Module</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_builders</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span> <span class="o">=</span> <span class="n">ts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_references</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">references</span>
+        <span class="c1"># for allocated variables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_allocas</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># for functions and strings deduplication</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_function_names</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_string_idx</span> <span class="o">=</span> <span class="mi">0</span>
+</code></pre></div>
+<p>As always, let's <code>visit</code> the program first:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_program</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Program</span><span class="p">):</span>
+    <span class="n">main</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">ir</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">VoidType</span><span class="p">(),</span> <span class="p">()),</span> <span class="s1">&#39;.main&#39;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enter</span><span class="p">(</span><span class="n">main</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">ret_void</span><span class="p">()</span>
+</code></pre></div>
+<p>Here <code>_enter</code> is more ore less the same as in our type system:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@contextmanager</span>
+<span class="k">def</span> <span class="nf">_enter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_builders</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IRBuilder</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">()))</span>
+    <span class="k">yield</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_builders</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+</code></pre></div>
+<p>and <code>self.builder</code> is just a property:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@property</span>
+<span class="k">def</span> <span class="nf">builder</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ir</span><span class="o">.</span><span class="n">IRBuilder</span><span class="p">:</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_builders</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</code></pre></div>
+<p>In LLVM each function wants a separate IRBuilder, think of it as a storage for all the statements in the function's
+body.</p>
+<p>Even though there isn't a <code>main</code> function in Pascal as in <code>C</code>, LLVM can't just run stuff "in the global scope", so we
+have to create here a <code>.main</code> function. I chose this name, because it's not a valid function name in Pascal, so we
+won't have name collisions.</p>
+<p>For now this function is pretty simple. It has no arguments, neither variables, it just goes through the statements
+and return <code>Void</code> at the end.</p>
+<h4 id="expression-statement">Expression statement</h4>
+<p>As I quickly mentioned in the previous post, we'll expect from <code>lvalues</code> to return a pointer. This will be the
+signature of methods that deal with values:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_my_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+</code></pre></div>
+<p>Now we don't need the "<code>expected</code>" argument, because all the information regarding types is already present.</p>
+<p>So, for expression statements the code is fairly simple:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_expression_statement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">ExpressionStatement</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="const">Const</h4>
+<p>Let's keep digging through the simple stuff first. Here's how we evaluate integer and floating constants:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_const</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Const</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">match</span> <span class="n">node</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+        <span class="k">case</span><span class="w"> </span><span class="n">types</span><span class="o">.</span><span class="n">SignedInt</span><span class="p">(</span><span class="k">_</span><span class="p">)</span> <span class="o">|</span> <span class="n">types</span><span class="o">.</span><span class="n">Floating</span><span class="p">(</span><span class="n">_</span><span class="p">)</span> <span class="k">as</span> <span class="n">kind</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">resolve</span><span class="p">(</span><span class="n">kind</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="c1"># ... more cases later</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</code></pre></div>
+<p>Here <code>resolve</code> is the bridge between our own type system and the one from LLVM:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">resolve</span><span class="p">(</span><span class="n">kind</span><span class="p">):</span>
+    <span class="k">match</span> <span class="n">kind</span><span class="p">:</span>
+        <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">Void</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ir</span><span class="o">.</span><span class="n">VoidType</span><span class="p">()</span>
+        <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">Char</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">SignedInt</span><span class="p">(</span><span class="n">bits</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">Floating</span><span class="p">(</span><span class="mi">64</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ir</span><span class="o">.</span><span class="n">DoubleType</span><span class="p">()</span>
+        <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">Reference</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span> <span class="o">|</span> <span class="n">types</span><span class="o">.</span><span class="n">Pointer</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span> <span class="o">|</span> <span class="n">types</span><span class="o">.</span><span class="n">DynamicArray</span><span class="p">(</span><span class="n">kind</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ir</span><span class="o">.</span><span class="n">PointerType</span><span class="p">(</span><span class="n">resolve</span><span class="p">(</span><span class="n">kind</span><span class="p">))</span>
+        <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">StaticArray</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">kind</span><span class="p">):</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">mul</span><span class="p">,</span> <span class="p">[</span><span class="n">b</span> <span class="o">-</span> <span class="n">a</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ir</span><span class="o">.</span><span class="n">ArrayType</span><span class="p">(</span><span class="n">resolve</span><span class="p">(</span><span class="n">kind</span><span class="p">),</span> <span class="n">size</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">Record</span><span class="p">(</span><span class="n">fields</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">ir</span><span class="o">.</span><span class="n">LiteralStructType</span><span class="p">([</span><span class="n">resolve</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">])</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span>
+</code></pre></div>
+<p>As we can see, LLVM's type system is much simpler, e.g. arrays are only 1-dimensional and start always at 0 also
+there are no references or dynamic arrays, just pointers.</p>
+<h4 id="binary">Binary</h4>
+<p>Once again, binary operators are a headache:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_binary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Binary</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">)</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">)</span>
+    <span class="n">kind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">left</span><span class="p">)</span>
+    <span class="n">right_kind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">right</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">kind</span> <span class="o">==</span> <span class="n">right_kind</span><span class="p">,</span> <span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">right_kind</span><span class="p">)</span>
+
+    <span class="k">match</span> <span class="n">kind</span><span class="p">:</span>
+        <span class="k">case</span><span class="w"> </span><span class="n">types</span><span class="o">.</span><span class="n">SignedInt</span><span class="p">(</span><span class="k">_</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">op</span> <span class="ow">in</span> <span class="n">COMPARISON</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">icmp_signed</span><span class="p">(</span><span class="n">COMPARISON</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">],</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;+&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="p">,</span>
+                <span class="s1">&#39;-&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span>
+                <span class="s1">&#39;*&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span>
+                <span class="s1">&#39;/&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">sdiv</span><span class="p">,</span>
+            <span class="p">}[</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">](</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+
+        <span class="k">case</span><span class="w"> </span><span class="n">types</span><span class="o">.</span><span class="n">Floating</span><span class="p">(</span><span class="k">_</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">op</span> <span class="ow">in</span> <span class="n">COMPARISON</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">fcmp_ordered</span><span class="p">(</span><span class="n">COMPARISON</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">],</span> <span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;+&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">fadd</span><span class="p">,</span>
+                <span class="s1">&#39;-&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">fsub</span><span class="p">,</span>
+                <span class="s1">&#39;*&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">fmul</span><span class="p">,</span>
+                <span class="s1">&#39;/&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">fdiv</span><span class="p">,</span>
+            <span class="p">}[</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">](</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+
+        <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">Boolean</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s1">&#39;and&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">and_</span><span class="p">,</span>
+                <span class="s1">&#39;or&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">or_</span><span class="p">,</span>
+            <span class="p">}[</span><span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">](</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">)</span>
+
+        <span class="k">case</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div>
+<p>We visit the left and right operand, and make sure they have the same type, which must be true after type casting.
+Here's how we get the type of a node:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="o">.</span><span class="n">casting</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="o">.</span><span class="n">casting</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+</code></pre></div>
+<div class="admonition note">
+<p>Quick reminder: self._ts is an instance of the TypeSystem class, which already analyzed our program.</p>
+</div>
+<p>Then, based on the type we choose from the
+<a href="https://llvmlite.readthedocs.io/en/latest/user-guide/ir/ir-builder.html#arithmetic">multitude</a> of LLVM's operators.
+Logical operators get special treatment, because of how they are represented in Pascal:</p>
+<div class="highlight"><pre><span></span><code><span class="n">COMPARISON</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;&lt;&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;&lt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;&gt;&#39;</span><span class="p">:</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;&gt;=&#39;</span><span class="p">:</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;=&#39;</span><span class="p">:</span> <span class="s1">&#39;==&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;&lt;&gt;&#39;</span><span class="p">:</span> <span class="s1">&#39;!=&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>We need this mapping to simplify the conversion from <code>&lt;&gt;</code> to the modern globally accepted <code>!=</code>.</p>
+<h4 id="running-the-code">Running the code</h4>
+<p>Now we can finally run our stupid program! We'll need to set a few things up first:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">ctypes</span>
+
+<span class="kn">import</span> <span class="nn">llvmlite.binding</span> <span class="k">as</span> <span class="nn">llvm</span>
+
+<span class="kn">from</span> <span class="nn">pascal_llvm.compiler</span> <span class="kn">import</span> <span class="n">Compiler</span>
+<span class="kn">from</span> <span class="nn">pascal_llvm.parser</span> <span class="kn">import</span> <span class="n">Parser</span>
+<span class="kn">from</span> <span class="nn">pascal_llvm.tokenizer</span> <span class="kn">import</span> <span class="n">tokenize</span>
+<span class="kn">from</span> <span class="nn">pascal_llvm.type_system</span> <span class="kn">import</span> <span class="n">TypeSystem</span>
+
+<span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">program add;</span>
+<span class="s1">begin</span>
+<span class="s1">    1 + 1;</span>
+<span class="s1">end.</span>
+<span class="s1">&#39;&#39;&#39;</span>
+<span class="c1"># scan and parse</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+<span class="n">parser</span> <span class="o">=</span> <span class="n">Parser</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+<span class="n">program</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">_program</span><span class="p">()</span>
+<span class="c1"># add types</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="n">TypeSystem</span><span class="p">()</span>
+<span class="n">ts</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">program</span><span class="p">)</span>
+<span class="c1"># compile</span>
+<span class="n">compiler</span> <span class="o">=</span> <span class="n">Compiler</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+<span class="n">compiler</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">program</span><span class="p">)</span>
+<span class="n">module</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">module</span>
+<span class="c1"># translate</span>
+<span class="n">module</span> <span class="o">=</span> <span class="n">llvm</span><span class="o">.</span><span class="n">parse_assembly</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="p">))</span>
+<span class="n">module</span><span class="o">.</span><span class="n">verify</span><span class="p">()</span>
+<span class="c1"># init</span>
+<span class="n">llvm</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+<span class="n">llvm</span><span class="o">.</span><span class="n">initialize_native_target</span><span class="p">()</span>
+<span class="n">llvm</span><span class="o">.</span><span class="n">initialize_native_asmprinter</span><span class="p">()</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">llvm</span><span class="o">.</span><span class="n">Target</span><span class="o">.</span><span class="n">from_default_triple</span><span class="p">()</span>
+<span class="n">machine</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">create_target_machine</span><span class="p">()</span>
+<span class="n">engine</span> <span class="o">=</span> <span class="n">llvm</span><span class="o">.</span><span class="n">create_mcjit_compiler</span><span class="p">(</span><span class="n">llvm</span><span class="o">.</span><span class="n">parse_assembly</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">machine</span><span class="p">)</span>
+<span class="c1"># load the code</span>
+<span class="n">engine</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+<span class="n">engine</span><span class="o">.</span><span class="n">finalize_object</span><span class="p">()</span>
+<span class="n">engine</span><span class="o">.</span><span class="n">run_static_constructors</span><span class="p">()</span>
+<span class="c1"># get the &quot;.main&quot; function pointer</span>
+<span class="n">main</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">CFUNCTYPE</span><span class="p">(</span><span class="kc">None</span><span class="p">)(</span><span class="n">engine</span><span class="o">.</span><span class="n">get_function_address</span><span class="p">(</span><span class="s1">&#39;.main&#39;</span><span class="p">))</span>
+<span class="c1"># call it</span>
+<span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+<p>That's a lot of <a href="https://en.wikipedia.org/wiki/Glue_code">glue code</a>. But it's reusable! From now on you can simply
+change the <code>source</code> and play around with the compiler as it gets smarter.</p>
+<p>At this point this will do basically nothing, but we could print
+<a href="https://subscription.packtpub.com/book/programming/9781785280801/1/ch01lvl1sec09/getting-familiar-with-llvm-ir">LLVM's IR</a>
+and see what it thinks of our code. Just call <code>print(module)</code>:</p>
+<div class="highlight"><pre><span></span><code>; ModuleID = &quot;&quot;
+target triple = &quot;unknown-unknown-unknown&quot;
+target datalayout = &quot;&quot;
+
+define void @&quot;.main&quot;()
+{
+.2:
+  %&quot;.3&quot; = add i8 1, 1
+  ret void
+}
+</code></pre></div>
+<p>Even if you're not familiar with the syntax, it's pretty clear what's happening here - a function definition, which
+adds two i8 (char) constants, stores them in a temporary variable and returns nothing. Just as we intended!</p>
+<div class="admonition note">
+<p>If you expected LLVM to optimize out this useless <code>add</code> operation, you're totally right. We'll get to that later.</p>
+</div>
+<h3 id="variables">Variables</h3>
+<p>Our next milestone is adding variables and tons of code that works with them. First of all, let's define them:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_program</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Program</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">definitions</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">definitions</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">GlobalVariable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">resolve</span><span class="p">(</span><span class="n">definitions</span><span class="o">.</span><span class="n">type</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="o">.</span><span class="n">normalized</span><span class="p">)</span>
+            <span class="n">var</span><span class="o">.</span><span class="n">linkage</span> <span class="o">=</span> <span class="s1">&#39;private&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_allocas</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span>
+
+    <span class="n">main</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">ir</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">VoidType</span><span class="p">(),</span> <span class="p">()),</span> <span class="s1">&#39;.main&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enter</span><span class="p">(</span><span class="n">main</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">ret_void</span><span class="p">()</span>
+</code></pre></div>
+<p>Nothing special, we create a global variable of a given type and store it in our <code>_allocas</code> dict. I'm not very familiar
+with use-cases for different <a href="https://www.llvm.org/docs/LangRef.html#linkage-types">linkage types</a>, but here "private"
+is the way to go - this is basically a global variable <em>private</em> to this module.</p>
+<h4 id="name">Name</h4>
+<p>Now that we can define variables, let's learn to get their values and pointers.</p>
+<p>Remember how in the previous post we resolved each <code>Name</code> node, and found out what it references? It's time to use this
+info:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Name</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_references</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocas</span><span class="p">[</span><span class="n">target</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">lvalue</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">Reference</span><span class="p">):</span>
+            <span class="n">ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ptr</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span>
+</code></pre></div>
+<p>We get the right pointer first, then dereference it if it's an <code>rvalue</code>, otherwise - just return the pointer. A special
+case are references, which are represented as pointers: when we write</p>
+<div class="highlight"><pre><span></span><code><span class="k">procedure</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="k">var</span><span class="w"> </span><span class="n">x</span><span class="o">:</span><span class="w"> </span><span class="kt">integer</span><span class="p">)</span><span class="o">;</span>
+<span class="k">begin</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">1</span><span class="o">;</span>
+<span class="k">end</span><span class="o">;</span>
+</code></pre></div>
+<p>we <em>pretend</em> x is an integer, while under the hood it's a pointer. So, in <code>_allocas</code> we'll store<br />
+<em>a pointer to a pointer</em>, that's why we need an additional dereferencing step.</p>
+<h4 id="dereference">Dereference</h4>
+<p>Speaking of dereferencing:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_dereference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Dereference</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="c1"># always expect a pointer, so lvalue=True</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">lvalue</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ptr</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span>
+</code></pre></div>
+<p>More or less the same stuff.</p>
+<h4 id="unary">Unary</h4>
+<p>While we're at it, the opposite operation - taking the address - is another unary operator:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_unary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Unary</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="c1"># getting the address is a special case</span>
+    <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">op</span> <span class="o">==</span> <span class="s1">&#39;@&#39;</span><span class="p">:</span>
+        <span class="c1"># just get the name&#39;s address</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">)</span>
+    <span class="k">match</span> <span class="n">node</span><span class="o">.</span><span class="n">op</span><span class="p">:</span>
+        <span class="k">case</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">neg</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">case</span> <span class="s1">&#39;not&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">not_</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">case</span> <span class="n">x</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+</code></pre></div>
+<p><code>@</code> is, once again, a special case.</p>
+<h4 id="getfield">GetField</h4>
+<p>LLVM's notion of structs is pretty simple, and is basically indistinguishable from tuples.</p>
+<div class="highlight"><pre><span></span><code><span class="k">record</span>
+<span class="w">    </span><span class="n">count</span><span class="o">:</span><span class="w"> </span><span class="kt">integer</span><span class="o">;</span>
+<span class="w">    </span><span class="n">percentage</span><span class="o">:</span><span class="w"> </span><span class="kt">real</span><span class="o">;</span>
+<span class="k">end</span><span class="o">;</span>
+</code></pre></div>
+<p>This record will have the type <code>(i32, double)</code>. This means that we can't access fields by name, and must use integer 
+indices instead:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_get_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">GetField</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">kind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">Reference</span><span class="p">):</span>
+        <span class="n">kind</span> <span class="o">=</span> <span class="n">kind</span><span class="o">.</span><span class="n">type</span>
+    <span class="n">idx</span><span class="p">,</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kind</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">gep</span><span class="p">(</span>
+        <span class="n">ptr</span><span class="p">,</span> <span class="p">[</span><span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="mi">0</span><span class="p">),</span> <span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">idx</span><span class="p">)]</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">lvalue</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ptr</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span>
+</code></pre></div>
+<p>We then use the <code>gep</code> (get element pointer) command to take the value at the right index in the "tuple".</p>
+<div class="admonition note">
+<p>I have no idea why we must pass a list with <code>ir.Constant(ir.IntType(32), 0)</code> as the first element, but all the 
+examples I found do it this way. If you can enlighten me, please leave a comment at the bottom of the page <img alt="😉" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@14.1.2/assets/svg/1f609.svg" title=":wink:" /></p>
+</div>
+<h4 id="getitem">GetItem</h4>
+<p>As we saw earlier, in the LLVM world there are only 1D arrays that start from 0. That's ok, we just need to figure out
+a way to <em>flatten</em> Pascal's arrays. There are many ways to do that, we'll use strides here, more or less in the same
+fashion as <a href="https://numpy.org/">numpy</a> does:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">GetItem</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="c1"># we always want a pointer from the parent</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">stride</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">)</span><span class="o">.</span><span class="n">dims</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">),</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">))):</span>
+        <span class="n">local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># upcast to i32</span>
+        <span class="n">local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast</span><span class="p">(</span><span class="n">local</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">arg</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># extract the origin</span>
+        <span class="n">local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">local</span><span class="p">,</span> <span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">start</span><span class="p">))</span>
+        <span class="c1"># multiply by stride</span>
+        <span class="n">local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">local</span><span class="p">,</span> <span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="n">stride</span><span class="p">))</span>
+        <span class="c1"># add to index</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">local</span><span class="p">)</span>
+        <span class="n">stride</span> <span class="o">*=</span> <span class="n">stop</span> <span class="o">-</span> <span class="n">start</span>
+
+    <span class="n">ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">gep</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="p">[</span><span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="mi">0</span><span class="p">),</span> <span class="n">idx</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">lvalue</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ptr</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span>
+</code></pre></div>
+<p>That's a lot of code, but basically this is what it does:</p>
+<div class="highlight"><pre><span></span><code><span class="n">llvm_index</span> <span class="o">=</span> <span class="n">stride1</span> <span class="o">*</span> <span class="p">(</span><span class="n">pascal_index1</span> <span class="o">-</span> <span class="n">index_start1</span><span class="p">)</span> <span class="o">+</span> <span class="n">stride2</span> <span class="o">*</span> <span class="p">(</span><span class="n">pascal_index2</span> <span class="o">-</span> <span class="n">index_start2</span><span class="p">)</span> <span class="o">+</span> <span class="o">...</span>
+</code></pre></div>
+<p><a href="https://stackoverflow.com/questions/53097952/how-to-understand-numpy-strides-for-layman">This StackOverflow question</a>
+has a great visualization of what's going on.</p>
+<h4 id="assignment">Assignment</h4>
+<p>The final node that will allow us to <em>modify</em> the variables we just created is the assignment:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_assignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Assignment</span><span class="p">):</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">Reference</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ptr</span><span class="p">)</span>
+</code></pre></div>
+<p>Also pretty straightforward: get the value from the right, get the address from the left, store one in the other.</p>
+<h3 id="statements">Statements</h3>
+<p>There aren't a lot of statements in Pascal, so let's dig through them quickly:</p>
+<h4 id="if">If</h4>
+<p>LLVM reasons in blocks. A block is just a sequence of simple operations: no branching, no control flow or jumps.
+We just start with the first operation and finish with the last one.</p>
+<p>If we <em>need</em> to create a branch, though, we just do it between blocks:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_if</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">If</span><span class="p">):</span>
+    <span class="n">condition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">then_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">()</span>
+    <span class="n">else_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">()</span>
+    <span class="n">merged_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">cbranch</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">then_block</span><span class="p">,</span> <span class="n">else_block</span><span class="p">)</span>
+
+    <span class="c1"># then</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">then_block</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">then_</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">branch</span><span class="p">(</span><span class="n">merged_block</span><span class="p">)</span>
+    <span class="c1"># else</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">else_block</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">else_</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">branch</span><span class="p">(</span><span class="n">merged_block</span><span class="p">)</span>
+    <span class="c1"># phi</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">merged_block</span><span class="p">)</span>
+</code></pre></div>
+<p>So here's what's going on. We create 3 blocks: two for <code>if</code>'s branches and one for the final block. We create a
+conditional branch first, this will let us jump to one of the blocks, then we compile <em>each</em> branch. Note that
+at the beginning of each branch we enter the corresponding block with <code>position_at_end</code>, and at the end we create an
+unconditional <code>branch</code> (basically a jump) to the final block.</p>
+<p>That's more or less how all control flow will be implemented.</p>
+<h4 id="while">While</h4>
+<p><code>While</code> is, in a way, even simpler than <code>If</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_while</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">While</span><span class="p">):</span>
+    <span class="n">check_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">(</span><span class="s1">&#39;check&#39;</span><span class="p">)</span>
+    <span class="n">loop_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">(</span><span class="s1">&#39;for&#39;</span><span class="p">)</span>
+    <span class="n">end_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">(</span><span class="s1">&#39;for-end&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">branch</span><span class="p">(</span><span class="n">check_block</span><span class="p">)</span>
+
+    <span class="c1"># check</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">check_block</span><span class="p">)</span>
+    <span class="n">condition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">condition</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">cbranch</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">loop_block</span><span class="p">,</span> <span class="n">end_block</span><span class="p">)</span>
+
+    <span class="c1"># loop</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">loop_block</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">branch</span><span class="p">(</span><span class="n">check_block</span><span class="p">)</span>
+
+    <span class="c1"># exit</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">end_block</span><span class="p">)</span>
+</code></pre></div>
+<p>At each iteration we check the condition and make a conditional jump. Inside the loop we just compile the body and
+unconditionally jump back to the first block. This way we make create a loop. Easy!</p>
+<h4 id="for">For</h4>
+<p>As always, <code>For</code> is just a combination of <code>While</code> and some increments.</p>
+<div class="admonition note">
+<p>It makes you think, maybe we should have desugared this node in the previous post <img alt="🤔" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@14.1.2/assets/svg/1f914.svg" title=":thinking_face:" /></p>
+</div>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">For</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">stop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_assign</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+
+    <span class="n">check_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">(</span><span class="s1">&#39;check&#39;</span><span class="p">)</span>
+    <span class="n">loop_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">(</span><span class="s1">&#39;for&#39;</span><span class="p">)</span>
+    <span class="n">end_block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">(</span><span class="s1">&#39;for-end&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">branch</span><span class="p">(</span><span class="n">check_block</span><span class="p">)</span>
+
+    <span class="c1"># check</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">check_block</span><span class="p">)</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">condition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">icmp_signed</span><span class="p">(</span><span class="s1">&#39;&lt;=&#39;</span><span class="p">,</span> <span class="n">counter</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="s1">&#39;for-condition&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">cbranch</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">loop_block</span><span class="p">,</span> <span class="n">end_block</span><span class="p">)</span>
+
+    <span class="c1"># loop</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">loop_block</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+    <span class="c1"># update</span>
+    <span class="n">increment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">resolve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">name</span><span class="p">)),</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;increment&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_assign</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">increment</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">branch</span><span class="p">(</span><span class="n">check_block</span><span class="p">)</span>
+
+    <span class="c1"># exit</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">end_block</span><span class="p">)</span>
+</code></pre></div>
+<p>I guess only two pieces are interesting here:</p>
+<div class="highlight"><pre><span></span><code><span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">_assign</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+<span class="c1"># and</span>
+<span class="n">increment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">resolve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">name</span><span class="p">)),</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;increment&#39;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">_assign</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">increment</span><span class="p">)</span>
+</code></pre></div>
+<p><code>_assign</code> is almost identical to <code>_assignment</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_references</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocas</span><span class="p">[</span><span class="n">target</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">(</span><span class="n">target</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">Reference</span><span class="p">):</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">ptr</span><span class="p">)</span>
+</code></pre></div>
+<p>As we can see, we're writing to the same variable twice, but LLVM is cool with that.</p>
+<h3 id="functions-and-calls">Functions and calls</h3>
+<p>We're almost there!</p>
+<h4 id="function-definitions">Function definitions</h4>
+<p>We'll define all the functions <em>after</em> defining the global variables but <em>before</em> the main body:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_program</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Program</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">definitions</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">definitions</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
+            <span class="n">var</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">GlobalVariable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">resolve</span><span class="p">(</span><span class="n">definitions</span><span class="o">.</span><span class="n">type</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="o">.</span><span class="n">normalized</span><span class="p">)</span>
+            <span class="n">var</span><span class="o">.</span><span class="n">linkage</span> <span class="o">=</span> <span class="s1">&#39;private&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_allocas</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">var</span>
+
+    <span class="c1"># --- new stuff starts here ---</span>
+    <span class="k">for</span> <span class="n">func</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">functions</span><span class="p">:</span>
+        <span class="n">ir</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">ir</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">(</span><span class="n">resolve</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">return_type</span><span class="p">),</span> <span class="p">[</span><span class="n">resolve</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">func</span><span class="o">.</span><span class="n">args</span><span class="p">]),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_deduplicate</span><span class="p">(</span><span class="n">func</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">functions</span><span class="p">)</span>
+
+    <span class="n">main</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">ir</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">VoidType</span><span class="p">(),</span> <span class="p">()),</span> <span class="s1">&#39;.main&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enter</span><span class="p">(</span><span class="n">main</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">ret_void</span><span class="p">()</span>
+</code></pre></div>
+<p>Just like before, we first define <em>all</em> the functions, and only after that we visit each of their bodies. 
+Here <code>_deduplicate</code> helps us... uh... deduplicate the function names. Remember that we might have several overloaded 
+functions, LLVM can't digest that, so we need to help it a bit:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_deduplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Function</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_function_names</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_function_names</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;function.</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_function_names</span><span class="p">)</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_function_names</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+</code></pre></div>
+<p>We create a new unique name for each function. It's a pretty dumb strategy, I admit, but it's dead simple (that's a
+good thing!). If I was writing a real compiler, I would add some info regarding argument names and the return value 
+instead, this would help a lot with debugging.</p>
+<h4 id="function">Function</h4>
+<p>Now to the function itself. It's more or less the same thing as with the <code>Program</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Function</span><span class="p">):</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">get_global</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_deduplicate</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+    <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_enter</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">return_type</span> <span class="o">!=</span> <span class="n">types</span><span class="o">.</span><span class="n">Void</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_allocate</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">resolve</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">return_type</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">func</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">arg</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">normalized</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_allocate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">resolve</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">type</span><span class="p">),</span> <span class="n">arg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">definitions</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">definitions</span><span class="o">.</span><span class="n">names</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_allocate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">resolve</span><span class="p">(</span><span class="n">definitions</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">return_type</span> <span class="o">!=</span> <span class="n">types</span><span class="o">.</span><span class="n">Void</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">ret</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_allocas</span><span class="p">[</span><span class="n">ret</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">ret_void</span><span class="p">()</span>
+</code></pre></div>
+<ol>
+<li>Get the function</li>
+<li>Enter the scope</li>
+<li>Define the variables, the arguments and the return value, if any</li>
+<li>Visit the body</li>
+<li>Return</li>
+</ol>
+<p>The only difference is that we're not defining functions here, because Pascal doesn't support 
+<a href="https://en.wikipedia.org/wiki/Closure_(computer_programming)">closures</a>.</p>
+<p>We define local variables like so:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_allocate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Name</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="n">ir</span><span class="o">.</span><span class="n">Type</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_allocas</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">alloca</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="o">.</span><span class="n">normalized</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">initial</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocas</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</code></pre></div>
+<p><code>alloca</code> is LLVM's way to <em>allocate</em> a portion of memory.</p>
+<h4 id="call">Call</h4>
+<p>We can define functions. Time to learn how to call them:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Call</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="n">magic</span> <span class="o">=</span> <span class="n">MAGIC_FUNCTIONS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">normalized</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">magic</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">magic</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">)),</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_references</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">target</span><span class="p">]</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">get_global</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_deduplicate</span><span class="p">(</span><span class="n">target</span><span class="p">))</span>
+    <span class="n">signature</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">signature</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">kind</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">signature</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">Reference</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocas</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_references</span><span class="p">[</span><span class="n">arg</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+</code></pre></div>
+<p>If we ignore the <em>magical</em> part, this should be straightforward: </p>
+<ol>
+<li>Find the function by its name</li>
+<li>Compute the arguments</li>
+<li>Call the function with these arguments</li>
+</ol>
+<p>We only have a small hiccup with (2): if it's a mutable argument - we know for sure it's a variable (we checked for that
+in the previous post), so we can get its address directly from the <code>_allocas</code>.</p>
+<p>Now what about those first three lines? They deserve a separate section!</p>
+<h3 id="even-more-magic">Even more magic</h3>
+<p>Previously we learned how to validate the arguments of magic functions. Now let's figure out how to <em>evaluate</em> them.
+We'll extend the interface with another method:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">MagicFunction</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">visit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kinds</span><span class="p">,</span> <span class="n">compiler</span><span class="p">):</span>
+        <span class="k">pass</span>
+</code></pre></div>
+<p>and this is how <code>WriteLn</code> would implement it:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">WriteLn</span><span class="p">(</span><span class="n">MagicFunction</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">visit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">visit</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">Void</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kinds</span><span class="p">,</span> <span class="n">compiler</span><span class="p">):</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">string_pointer</span><span class="p">(</span><span class="n">format_io</span><span class="p">(</span><span class="n">kinds</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n\00</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">compiler</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">compiler</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">get_global</span><span class="p">(</span><span class="s1">&#39;printf&#39;</span><span class="p">),</span> <span class="p">[</span><span class="n">ptr</span><span class="p">,</span> <span class="o">*</span><span class="n">compiler</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="kc">False</span><span class="p">)])</span>
+</code></pre></div>
+<p>We're basically preparing arguments for <a href="https://en.wikipedia.org/wiki/Printf">printf</a> - a function from the C world. 
+It expects a format spec that depends on argument types:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">jboc</span> <span class="kn">import</span> <span class="n">composed</span>
+
+<span class="nd">@composed</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">format_io</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+        <span class="k">match</span> <span class="n">arg</span><span class="p">:</span>
+            <span class="k">case</span><span class="w"> </span><span class="n">types</span><span class="o">.</span><span class="n">SignedInt</span><span class="p">(</span><span class="k">_</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">&#39;</span>
+            <span class="k">case</span><span class="w"> </span><span class="n">types</span><span class="o">.</span><span class="n">Floating</span><span class="p">(</span><span class="k">_</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%f</span><span class="s1">&#39;</span>
+            <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">Char</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%c</span><span class="s1">&#39;</span>
+            <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">StaticArray</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">Char</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span>
+            <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">DynamicArray</span><span class="p">(</span><span class="n">types</span><span class="o">.</span><span class="n">Char</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span>
+            <span class="k">case</span> <span class="n">kind</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span>
+</code></pre></div>
+<p>We then just find <code>printf</code> and call it. But to find it we first need to define it. We'll store all the definitions for
+external functions here:</p>
+<div class="highlight"><pre><span></span><code><span class="n">FFI</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;printf&#39;</span><span class="p">:</span> <span class="n">ir</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="p">[</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">as_pointer</span><span class="p">()],</span> <span class="n">var_arg</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="s1">&#39;scanf&#39;</span><span class="p">:</span> <span class="n">ir</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="p">[</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">as_pointer</span><span class="p">()],</span> <span class="n">var_arg</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="s1">&#39;getchar&#39;</span><span class="p">:</span> <span class="n">ir</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="p">[]),</span>
+    <span class="s1">&#39;rand&#39;</span><span class="p">:</span> <span class="n">ir</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="p">[]),</span>
+    <span class="s1">&#39;srand&#39;</span><span class="p">:</span> <span class="n">ir</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">VoidType</span><span class="p">(),</span> <span class="p">[</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">)]),</span>
+    <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">ir</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="p">[</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">)]),</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="admonition note">
+<p>FFI stands for <a href="https://en.wikipedia.org/wiki/Foreign_function_interface">foreign function interface</a></p>
+</div>
+<p>I defined a bunch of them just in case. Note that <code>printf</code> and <code>scanf</code> are variadic, just like <code>writeln</code> and <code>readln</code> 
+in Pascal.</p>
+<p>Finally, we'll add these definitions in <code>Compiler</code>'s constructor:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">:</span> <span class="n">TypeSystem</span><span class="p">):</span>
+    <span class="c1"># ... other stuff</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">kind</span> <span class="ow">in</span> <span class="n">FFI</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">ir</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+<p>Wait. What's with that <code>string_pointer</code> function? We need to pass a pointer to the spec string to <code>printf</code>. Here's the 
+solution I came up with. We'll make compile-time string global constants like so:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">string_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+    <span class="n">kind</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">ArrayType</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+    <span class="n">global_string</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">GlobalVariable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;string.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_string_idx</span><span class="si">}</span><span class="s1">.global&#39;</span><span class="p">)</span>
+    <span class="n">global_string</span><span class="o">.</span><span class="n">global_constant</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">global_string</span><span class="o">.</span><span class="n">initializer</span> <span class="o">=</span> <span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="p">[</span><span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_string_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">gep</span><span class="p">(</span>
+        <span class="n">global_string</span><span class="p">,</span> <span class="p">[</span><span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="mi">0</span><span class="p">),</span> <span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">),</span> <span class="mi">0</span><span class="p">)]</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>We create a global variable with a unique name, <code>_string_idx</code> makes sure of that. We initialize it with our string, 
+then we take its pointer and return it.</p>
+<p>With this code in place, we can also add another branch to <code>_const</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_const</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Const</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">match</span> <span class="n">node</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+        <span class="k">case</span> <span class="n">types</span><span class="o">.</span><span class="n">StaticArray</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">Char</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">string_pointer</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="c1"># ... rest of the cases</span>
+</code></pre></div>
+<h4 id="read">Read</h4>
+<p>I'll show you a few more implementations real quick:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Read</span><span class="p">(</span><span class="n">MagicFunction</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">visit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">WrongType</span>
+
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">visit</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">Void</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kinds</span><span class="p">,</span> <span class="n">compiler</span><span class="p">):</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">string_pointer</span><span class="p">(</span><span class="n">format_io</span><span class="p">(</span><span class="n">kinds</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\00</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">compiler</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">compiler</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">get_global</span><span class="p">(</span><span class="s1">&#39;scanf&#39;</span><span class="p">),</span> <span class="p">[</span><span class="n">ptr</span><span class="p">,</span> <span class="o">*</span><span class="n">compiler</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="kc">True</span><span class="p">)])</span>
+</code></pre></div>
+<p>For <code>Read</code> we simply call into <code>scanf</code> instead of <code>printf</code>.</p>
+<h4 id="readln">ReadLn</h4>
+<p>Now <code>ReadLn</code> is a totally different beast:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">ReadLn</span><span class="p">(</span><span class="n">MagicFunction</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">visit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">visit</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">types</span><span class="o">.</span><span class="n">Void</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kinds</span><span class="p">,</span> <span class="n">compiler</span><span class="p">):</span>
+        <span class="n">builder</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">builder</span>
+        <span class="n">ptr</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">string_pointer</span><span class="p">(</span><span class="n">format_io</span><span class="p">(</span><span class="n">kinds</span><span class="p">)</span> <span class="o">+</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\00</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">compiler</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">get_global</span><span class="p">(</span><span class="s1">&#39;scanf&#39;</span><span class="p">),</span> <span class="p">[</span><span class="n">ptr</span><span class="p">,</span> <span class="o">*</span><span class="n">compiler</span><span class="o">.</span><span class="n">visit_sequence</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="kc">True</span><span class="p">)])</span>
+        <span class="c1"># ignore the rest of the line: while (getchar() != &#39;\n&#39;) {} // ord(&#39;\n&#39;) == 10</span>
+        <span class="n">check_block</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">(</span><span class="s1">&#39;check&#39;</span><span class="p">)</span>
+        <span class="n">loop_block</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">(</span><span class="s1">&#39;loop&#39;</span><span class="p">)</span>
+        <span class="n">end_block</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">append_basic_block</span><span class="p">(</span><span class="s1">&#39;end&#39;</span><span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">branch</span><span class="p">(</span><span class="n">check_block</span><span class="p">)</span>
+        <span class="c1"># check</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">check_block</span><span class="p">)</span>
+        <span class="n">condition</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">icmp_signed</span><span class="p">(</span>
+            <span class="s1">&#39;!=&#39;</span><span class="p">,</span> <span class="n">builder</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">compiler</span><span class="o">.</span><span class="n">module</span><span class="o">.</span><span class="n">get_global</span><span class="p">(</span><span class="s1">&#39;getchar&#39;</span><span class="p">),</span> <span class="p">()),</span> <span class="n">ir</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">ir</span><span class="o">.</span><span class="n">IntType</span><span class="p">(</span><span class="mi">8</span><span class="p">),</span> <span class="mi">10</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">cbranch</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">loop_block</span><span class="p">,</span> <span class="n">end_block</span><span class="p">)</span>
+        <span class="c1"># loop</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">loop_block</span><span class="p">)</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">branch</span><span class="p">(</span><span class="n">check_block</span><span class="p">)</span>
+        <span class="c1"># exit</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">position_at_end</span><span class="p">(</span><span class="n">end_block</span><span class="p">)</span>
+</code></pre></div>
+<p>We first read several values, then we must skip the rest until we hit the line end.
+All the wizardry here is just translating this C code:</p>
+<div class="highlight"><pre><span></span><code><span class="n">scanf</span><span class="p">(...);</span>
+<span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">getchar</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="sc">&#39;\n&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+</code></pre></div>
+<h3 id="final-preparations">Final preparations</h3>
+<p>Let's deal quickly with the boring stuff.</p>
+<h4 id="type-casting">Type casting</h4>
+<p>Just like before, all type casting is happening in <code>after_visit</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">_cast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="p">,</span> <span class="n">dst</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">DataType</span><span class="p">,</span> <span class="n">lvalue</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+    <span class="c1"># references are just fancy pointers</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">Reference</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">lvalue</span><span class="p">:</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">type</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">src</span> <span class="o">==</span> <span class="n">dst</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="k">match</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">:</span>
+        <span class="k">case</span><span class="w"> </span><span class="n">types</span><span class="o">.</span><span class="n">SignedInt</span><span class="p">(</span><span class="k">_</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">Floating</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">sitofp</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">resolve</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
+        <span class="k">case</span><span class="w"> </span><span class="n">types</span><span class="o">.</span><span class="n">SignedInt</span><span class="p">(</span><span class="k">_</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">SignedInt</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">builder</span><span class="o">.</span><span class="n">sext</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">resolve</span><span class="p">(</span><span class="n">dst</span><span class="p">))</span>
+        <span class="k">case</span><span class="w"> </span><span class="n">types</span><span class="o">.</span><span class="n">StaticArray</span><span class="p">(</span><span class="k">_</span><span class="p">),</span> <span class="n">types</span><span class="o">.</span><span class="n">DynamicArray</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="c1"># ... more cases here perhaps</span>
+
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">after_visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">lvalue</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="o">.</span><span class="n">casting</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">lvalue</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cast</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="o">.</span><span class="n">types</span><span class="p">[</span><span class="n">node</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="o">.</span><span class="n">casting</span><span class="p">[</span><span class="n">node</span><span class="p">],</span> <span class="n">lvalue</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span>
+</code></pre></div>
+<h4 id="desugaring">Desugaring</h4>
+<p>To write this one we'll need to extend the <code>Visitor</code> interface:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">Visitor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">before_visit</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">snake_case</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)(</span><span class="n">node</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">after_visit</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">before_visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">node</span>
+
+    <span class="c1"># ... other methods</span>
+</code></pre></div>
+<p>So, <em>before</em> visiting the node, we can change it and force the compiler to visit something else - perfect for 
+desugaring.</p>
+<p>And that's how the <code>Compiler</code> will implement it:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">before_visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ts</span><span class="o">.</span><span class="n">desugar</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition note">
+<p><code>d.get(x, x)</code> is just a quicker way to write <code>d[x] if x in d else x</code></p>
+</div>
+<h4 id="magic-registry">Magic registry</h4>
+<p>Last time we stored all our magic functions in a dict:</p>
+<div class="highlight"><pre><span></span><code><span class="n">MAGIC_FUNCTIONS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;writeln&#39;</span><span class="p">:</span> <span class="n">WriteLn</span><span class="p">,</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>For 2-3 functions this is fine, but it quickly becomes tedious. Here's a cool way to do this automatically:</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">MagicFunction</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="c1"># ... other methods</span>
+
+    <span class="k">def</span> <span class="nf">__init_subclass__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">MAGIC_FUNCTIONS</span>
+        <span class="n">MAGIC_FUNCTIONS</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span>
+</code></pre></div>
+<p><code>__init_subclass__</code> is a hook that is triggered right after a new subclass is created, you get the idea.</p>
+<h3 id="optimization">Optimization</h3>
+<p>At this point you should be able to finally print "Hello world!":</p>
+<div class="highlight"><pre><span></span><code><span class="k">program</span><span class="w"> </span><span class="n">main</span><span class="o">;</span>
+<span class="k">begin</span>
+<span class="w">    </span><span class="nb">writeln</span><span class="p">(</span><span class="s">&#39;Hello World!&#39;</span><span class="p">)</span><span class="o">;</span>
+<span class="k">end</span><span class="o">.</span>
+</code></pre></div>
+<p>But there's more we can do! An obvious strong side of LLVM is optimization - it has a lot of different optimizations.
+Today we'll just <a href="https://llvm.org/docs/Passes.htm">a few of them</a> that seem self-explanatory:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># ....</span>
+<span class="c1"># translate</span>
+<span class="n">module</span> <span class="o">=</span> <span class="n">llvm</span><span class="o">.</span><span class="n">parse_assembly</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">module</span><span class="p">))</span>
+<span class="n">module</span><span class="o">.</span><span class="n">verify</span><span class="p">()</span>
+
+<span class="c1"># optimize</span>
+<span class="n">pm_builder</span> <span class="o">=</span> <span class="n">llvm</span><span class="o">.</span><span class="n">PassManagerBuilder</span><span class="p">()</span>
+<span class="n">pm</span> <span class="o">=</span> <span class="n">llvm</span><span class="o">.</span><span class="n">ModulePassManager</span><span class="p">()</span>
+<span class="n">pm_builder</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="n">pm</span><span class="p">)</span>
+<span class="c1"># add passes</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">add_constant_merge_pass</span><span class="p">()</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">add_instruction_combining_pass</span><span class="p">()</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">add_reassociate_expressions_pass</span><span class="p">()</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">add_gvn_pass</span><span class="p">()</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">add_cfg_simplification_pass</span><span class="p">()</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">add_loop_simplification_pass</span><span class="p">()</span>
+<span class="n">pm</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+
+<span class="c1"># run</span>
+<span class="n">llvm</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+<span class="c1"># ...</span>
+</code></pre></div>
+<p>The pass manager <code>pm</code> will do all the heavy lifting for us:</p>
+<ul>
+<li>merge constants</li>
+<li>reassociate expressions: <code>(1 + 2) * (2 + 1) -&gt; (1 + 2) * (1 + 2)</code></li>
+<li>simplify expressions: <code>(1 + 2) * (1 + 2) -&gt; (1 + 2) ** 2</code></li>
+<li>simplify branching: control flow and loops</li>
+<li>remove redundant instructions</li>
+</ul>
+<p>You can print the <code>module</code> before and after <code>pm.run(module)</code> and see the difference. Pretty cool, right?</p>
+<h3 id="_1">~</h3>
+<p>If you're reading this, thanks for sticking around! I hope you enjoyed reading this series of posts as much as I enjoyed
+implementing all this stuff. </p>
+<p>There are a ton of ways one could improve this implementation, and it's by no means complete, but I feel like it still
+gives a good perspective of what are the key components. 
+Let me know in the comments if there are some interesting aspects that I didn't cover!</p>
+
+
+
+  
+
+
+
+  <h2 id="__comments">Comments</h2>
+  <script src="https://giscus.app/client.js"
+        data-repo="maxme1/maxme1.github.io"
+        data-repo-id="R_kgDOKaCvAw"
+        data-category="General"
+        data-category-id="DIC_kwDOKaCvA84CZx-l"
+        data-mapping="title"
+        data-strict="1"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="en"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async>
+  </script>
+
+  <!-- Synchronize Giscus theme with palette -->
+  <script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
+
+      
+    </article>
+  </div>
+
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../../../..", "features": ["content.code.copy", "content.code.annotate"], "search": "../../../../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.81fa17fe.min.js"></script>
+      
+    
+  </body>
+</html>
